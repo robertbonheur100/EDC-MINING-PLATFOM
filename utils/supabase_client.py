@@ -1,8 +1,3 @@
-"""
-Supabase client helpers.
-- get_supabase()       → anon key client  (user-facing, respects RLS)
-- get_admin_supabase() → service role key (server-side only, bypasses RLS)
-"""
 from supabase import create_client, Client
 from config import Config
 
@@ -18,7 +13,7 @@ def get_supabase() -> Client:
 
 
 def get_admin_supabase() -> Client:
-    """Use for all server-side operations that need to bypass RLS."""
+    """Server-side client — uses service role key, bypasses RLS."""
     global _admin_client
     if _admin_client is None:
         _admin_client = create_client(Config.SUPABASE_URL, Config.SUPABASE_SERVICE_KEY)
