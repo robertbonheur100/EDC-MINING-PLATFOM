@@ -8,9 +8,13 @@ from routes.admin import admin_bp
 from routes.investments import investments_bp
 from routes.referrals import referrals_bp
 
+
 def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
+
+    # Create session dir if it doesn't exist
+    os.makedirs(app.config['SESSION_FILE_DIR'], exist_ok=True)
 
     Session(app)
 
@@ -29,7 +33,9 @@ def create_app():
 
 app = create_app()
 
+# Start scheduler once (works with gunicorn --workers 1 or direct python run)
+from scheduler import start_scheduler
+start_scheduler()
+
 if __name__ == '__main__':
-    from scheduler import start_scheduler
-    start_scheduler()
     app.run(debug=False, host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
