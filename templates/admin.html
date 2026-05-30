@@ -69,20 +69,20 @@
       </div>
 
       <div class="card">
-        <div class="card-header"><h3>Daily Profit Distribution Monitor</h3></div>
+        <div class="card-header"><h3>Daily Profit Monitor</h3></div>
         <div class="table-wrap">
           <table class="data-table">
-            <thead><tr><th>User</th><th>Plan</th><th>Amount</th><th>Daily Profit</th><th>Total Earned</th><th>Last Paid</th><th>Status</th></tr></thead>
+            <thead><tr><th>User</th><th>Plan</th><th>Amount</th><th>Daily</th><th>Earned</th><th>Last Paid</th><th>Status</th></tr></thead>
             <tbody>
             {% for inv in investments %}
             <tr>
-              <td>{{ inv.profiles.username if inv.profiles else '—' }}</td>
-              <td>{{ inv.plan_name }}</td>
-              <td>${{ "%.2f"|format(inv.amount) }}</td>
-              <td class="text-green">+${{ "%.2f"|format(inv.amount * 0.02) }}</td>
-              <td>${{ "%.2f"|format(inv.total_earned or 0) }}</td>
-              <td class="text-muted">{{ (inv.last_profit_date or 'Never')[:10] }}</td>
-              <td><span class="status-badge status--{{ inv.status }}">{{ inv.status.upper() }}</span></td>
+              <td>{{ user_map.get(inv.get('user_id'), '—') }}</td>
+              <td>{{ inv.get('plan_name','—') }}</td>
+              <td>${{ "%.2f"|format(inv.get('amount',0)) }}</td>
+              <td class="text-green">+${{ "%.2f"|format(inv.get('amount',0) * 0.02) }}</td>
+              <td>${{ "%.2f"|format(inv.get('total_earned') or 0) }}</td>
+              <td class="text-muted">{{ (inv.get('last_profit_date') or 'Never')[:10] }}</td>
+              <td><span class="status-badge status--{{ inv.get('status','') }}">{{ inv.get('status','').upper() }}</span></td>
             </tr>
             {% else %}
             <tr><td colspan="7" class="text-center text-muted">No investments</td></tr>
@@ -104,7 +104,7 @@
               <select name="user_id" required>
                 <option value="">Choose user…</option>
                 {% for u in users %}
-                <option value="{{ u.id }}">{{ u.username }} — ${{ "%.2f"|format(u.balance or 0) }}</option>
+                <option value="{{ u.id }}">{{ u.username }} — ${{ "%.2f"|format(u.get('balance') or 0) }}</option>
                 {% endfor %}
               </select>
             </div>
@@ -132,11 +132,11 @@
             <tbody>
             {% for u in users %}
             <tr>
-              <td><strong>{{ u.username }}</strong></td>
-              <td>{{ u.email }}</td>
-              <td class="text-green">${{ "%.2f"|format(u.balance or 0) }}</td>
-              <td class="text-mono">{{ u.referral_code or '—' }}</td>
-              <td class="text-muted">{{ (u.created_at or '')[:10] }}</td>
+              <td><strong>{{ u.get('username','—') }}</strong></td>
+              <td>{{ u.get('email','—') }}</td>
+              <td class="text-green">${{ "%.2f"|format(u.get('balance') or 0) }}</td>
+              <td class="text-mono">{{ u.get('referral_code','—') }}</td>
+              <td class="text-muted">{{ (u.get('created_at') or '')[:10] }}</td>
             </tr>
             {% else %}
             <tr><td colspan="5" class="text-center text-muted">No users</td></tr>
@@ -156,23 +156,23 @@
             <thead><tr><th>User</th><th>Amount</th><th>Network</th><th>Proof</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead>
             <tbody>
             {% for d in deposits %}
-            <tr class="{{ 'row-pending' if d.status == 'pending' else '' }}">
-              <td>{{ d.profiles.username if d.profiles else '—' }}</td>
-              <td><strong>${{ "%.2f"|format(d.amount) }}</strong></td>
-              <td>{{ d.network or '—' }}</td>
-              <td class="text-muted text-mono">{{ (d.proof_note or '—')[:28] }}</td>
-              <td><span class="status-badge status--{{ d.status }}">{{ d.status.upper() }}</span></td>
-              <td class="text-muted">{{ (d.created_at or '')[:10] }}</td>
+            <tr class="{{ 'row-pending' if d.get('status') == 'pending' else '' }}">
+              <td>{{ user_map.get(d.get('user_id'), '—') }}</td>
+              <td><strong>${{ "%.2f"|format(d.get('amount',0)) }}</strong></td>
+              <td>{{ d.get('network','—') }}</td>
+              <td class="text-muted text-mono">{{ (d.get('proof_note') or '—')[:28] }}</td>
+              <td><span class="status-badge status--{{ d.get('status','') }}">{{ d.get('status','').upper() }}</span></td>
+              <td class="text-muted">{{ (d.get('created_at') or '')[:10] }}</td>
               <td>
-                {% if d.status == 'pending' %}
+                {% if d.get('status') == 'pending' %}
                 <div class="action-btns">
                   <form method="POST" action="{{ url_for('admin.handle_deposit', deposit_id=d.id, action='approve') }}" style="display:inline">
                     <button type="submit" class="btn btn--xs btn--success"
-                      onclick="return confirm('Approve ${{ d.amount }}?')">✓</button>
+                      onclick="return confirm('Approve ${{ d.get(\'amount\',0) }}?')">✓ Approve</button>
                   </form>
                   <form method="POST" action="{{ url_for('admin.handle_deposit', deposit_id=d.id, action='reject') }}" style="display:inline">
                     <button type="submit" class="btn btn--xs btn--danger"
-                      onclick="return confirm('Reject this deposit?')">✗</button>
+                      onclick="return confirm('Reject this deposit?')">✗ Reject</button>
                   </form>
                 </div>
                 {% else %}—{% endif %}
@@ -196,23 +196,23 @@
             <thead><tr><th>User</th><th>Amount</th><th>Wallet</th><th>Network</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead>
             <tbody>
             {% for w in withdrawals %}
-            <tr class="{{ 'row-pending' if w.status == 'pending' else '' }}">
-              <td>{{ w.profiles.username if w.profiles else '—' }}</td>
-              <td><strong>${{ "%.2f"|format(w.amount) }}</strong></td>
-              <td class="text-mono">{{ (w.wallet_address or '—')[:18] }}…</td>
-              <td>{{ w.network or '—' }}</td>
-              <td><span class="status-badge status--{{ w.status }}">{{ w.status.upper() }}</span></td>
-              <td class="text-muted">{{ (w.created_at or '')[:10] }}</td>
+            <tr class="{{ 'row-pending' if w.get('status') == 'pending' else '' }}">
+              <td>{{ user_map.get(w.get('user_id'), '—') }}</td>
+              <td><strong>${{ "%.2f"|format(w.get('amount',0)) }}</strong></td>
+              <td class="text-mono">{{ (w.get('wallet_address') or '—')[:18] }}…</td>
+              <td>{{ w.get('network','—') }}</td>
+              <td><span class="status-badge status--{{ w.get('status','') }}">{{ w.get('status','').upper() }}</span></td>
+              <td class="text-muted">{{ (w.get('created_at') or '')[:10] }}</td>
               <td>
-                {% if w.status == 'pending' %}
+                {% if w.get('status') == 'pending' %}
                 <div class="action-btns">
                   <form method="POST" action="{{ url_for('admin.handle_withdrawal', wd_id=w.id, action='approve') }}" style="display:inline">
                     <button type="submit" class="btn btn--xs btn--success"
-                      onclick="return confirm('Approve ${{ w.amount }}?')">✓</button>
+                      onclick="return confirm('Approve ${{ w.get(\'amount\',0) }}?')">✓ Approve</button>
                   </form>
                   <form method="POST" action="{{ url_for('admin.handle_withdrawal', wd_id=w.id, action='reject') }}" style="display:inline">
                     <button type="submit" class="btn btn--xs btn--danger"
-                      onclick="return confirm('Reject this withdrawal?')">✗</button>
+                      onclick="return confirm('Reject?')">✗ Reject</button>
                   </form>
                 </div>
                 {% else %}—{% endif %}
@@ -233,17 +233,17 @@
         <div class="card-header"><h3>All Investment Plans</h3></div>
         <div class="table-wrap">
           <table class="data-table">
-            <thead><tr><th>User</th><th>Plan</th><th>Amount</th><th>Daily</th><th>Total Earned</th><th>Start</th><th>Status</th></tr></thead>
+            <thead><tr><th>User</th><th>Plan</th><th>Amount</th><th>Daily</th><th>Earned</th><th>Start</th><th>Status</th></tr></thead>
             <tbody>
             {% for inv in investments %}
             <tr>
-              <td>{{ inv.profiles.username if inv.profiles else '—' }}</td>
-              <td>{{ inv.plan_name }}</td>
-              <td>${{ "%.2f"|format(inv.amount) }}</td>
-              <td class="text-green">+${{ "%.2f"|format(inv.amount * 0.02) }}</td>
-              <td>${{ "%.2f"|format(inv.total_earned or 0) }}</td>
-              <td class="text-muted">{{ (inv.start_date or '')[:10] }}</td>
-              <td><span class="status-badge status--{{ inv.status }}">{{ inv.status.upper() }}</span></td>
+              <td>{{ user_map.get(inv.get('user_id'), '—') }}</td>
+              <td>{{ inv.get('plan_name','—') }}</td>
+              <td>${{ "%.2f"|format(inv.get('amount',0)) }}</td>
+              <td class="text-green">+${{ "%.2f"|format(inv.get('amount',0) * 0.02) }}/day</td>
+              <td>${{ "%.2f"|format(inv.get('total_earned') or 0) }}</td>
+              <td class="text-muted">{{ (inv.get('start_date') or '')[:10] }}</td>
+              <td><span class="status-badge status--{{ inv.get('status','') }}">{{ inv.get('status','').upper() }}</span></td>
             </tr>
             {% else %}
             <tr><td colspan="7" class="text-center text-muted">No investments</td></tr>
@@ -264,12 +264,12 @@
             <tbody>
             {% for tx in transactions %}
             <tr>
-              <td>{{ tx.profiles.username if tx.profiles else '—' }}</td>
-              <td><span class="type-badge type--{{ tx.type }}">{{ tx.type.replace('_',' ').title() }}</span></td>
-              <td class="{{ 'text-green' if tx.amount > 0 else 'text-red' }}">${{ "%.2f"|format(tx.amount|abs) }}</td>
-              <td>{{ (tx.description or '—')[:55] }}</td>
-              <td><span class="status-badge status--{{ tx.status }}">{{ tx.status.upper() }}</span></td>
-              <td class="text-muted">{{ (tx.created_at or '')[:10] }}</td>
+              <td>{{ user_map.get(tx.get('user_id'), '—') }}</td>
+              <td><span class="type-badge type--{{ tx.get('type','') }}">{{ tx.get('type','').replace('_',' ').title() }}</span></td>
+              <td class="{{ 'text-green' if tx.get('amount',0) > 0 else 'text-red' }}">${{ "%.2f"|format(tx.get('amount',0)|abs) }}</td>
+              <td>{{ (tx.get('description') or '—')[:55] }}</td>
+              <td><span class="status-badge status--{{ tx.get('status','') }}">{{ tx.get('status','').upper() }}</span></td>
+              <td class="text-muted">{{ (tx.get('created_at') or '')[:10] }}</td>
             </tr>
             {% else %}
             <tr><td colspan="6" class="text-center text-muted">No transactions</td></tr>
@@ -290,10 +290,10 @@
             <tbody>
             {% for a in actions %}
             <tr>
-              <td><span class="type-badge">{{ a.action.replace('_',' ').title() }}</span></td>
-              <td class="text-mono text-muted">{{ (a.target_id or '—')[:16] }}</td>
-              <td>{{ a.details or '—' }}</td>
-              <td class="text-muted">{{ (a.created_at or '')[:16] }}</td>
+              <td><span class="type-badge">{{ a.get('action','').replace('_',' ').title() }}</span></td>
+              <td class="text-mono text-muted">{{ (a.get('target_id') or '—')[:16] }}</td>
+              <td>{{ a.get('details','—') }}</td>
+              <td class="text-muted">{{ (a.get('created_at') or '')[:16] }}</td>
             </tr>
             {% else %}
             <tr><td colspan="4" class="text-center text-muted">No actions logged</td></tr>
