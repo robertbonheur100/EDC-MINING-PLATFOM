@@ -12,13 +12,13 @@ class Config:
     SESSION_FILE_DIR     = os.path.join(os.path.dirname(__file__), 'flask_session')
 
     # Supabase
-    SUPABASE_URL         = os.environ.get('SUPABASE_URL',         'https://YOUR_PROJECT.supabase.co')
-    SUPABASE_ANON_KEY    = os.environ.get('SUPABASE_ANON_KEY',    'YOUR_ANON_KEY')
-    SUPABASE_SERVICE_KEY = os.environ.get('SUPABASE_SERVICE_KEY', 'YOUR_SERVICE_ROLE_KEY')
+    SUPABASE_URL         = os.environ.get('https://dwpqshayuuivlmuvmpsb.supabase.co',         'https://dwpqshayuuivlmuvmpsb.supabase.co')
+    SUPABASE_ANON_KEY    = os.environ.get('sb_publishable_XqkNeTKirUWG3f8qi-bk6g_uzTgDtiu',    'sb_publishable_XqkNeTKirUWG3f8qi-bk6g_uzTgDtiu')
+    SUPABASE_SERVICE_KEY = os.environ.get('SERVICE_KEY', 'SERVICE_KEY')
 
     # Admin
-    ADMIN_EMAIL    = os.environ.get('ADMIN_EMAIL',    'admin@edc.com')
-    ADMIN_PASSWORD = os.environ.get('ADMIN_PASSWORD', 'Admin@EDC2024!')
+    ADMIN_EMAIL    = os.environ.get('ADMIN_EMAIL',    'bonheurrobert701@gmail.com')
+    ADMIN_PASSWORD = os.environ.get('ADMIN_PASSWORD', 'Aaa111@@@')
 
     # Platform constants
     DAILY_PROFIT_RATE  = 0.02
