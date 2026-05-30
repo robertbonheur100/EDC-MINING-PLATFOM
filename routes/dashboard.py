@@ -1,5 +1,6 @@
 from datetime import datetime, timezone
 from flask import Blueprint, render_template, request, redirect, url_for, session, flash
+
 from config import Config
 from utils.supabase_client import get_admin_supabase
 from utils.helpers import login_required
@@ -7,60 +8,99 @@ from utils.helpers import login_required
 dashboard_bp = Blueprint('dashboard', __name__)
 
 
+# ─────────────────────────────────────────────
+# DASHBOARD HOME
+# ─────────────────────────────────────────────
 @dashboard_bp.route('/')
 @login_required
 def index():
     db = get_admin_supabase()
-    uid = session['user_id']
+    uid = session.get('user_id')
 
-    # SAFE PROFILE (NO .single)
-    profile_res = db.table('profiles').select('*').eq('id', uid).execute()
-    profile = profile_res.data[0] if profile_res.data else {}
+    if not uid:
+        return redirect(url_for('auth.login'))
 
-    deposits = db.table('deposits').select('*').eq('user_id', uid).order('created_at', desc=True).limit(20).execute().data or []
+    try:
+        # PROFILE (SAFE)
+        profile_res = db.table('profiles').select('*').eq('id', uid).execute()
+        profile = (profile_res.data or [{}])[0]
 
-    withdrawals = db.table('withdrawals').select('*').eq('user_id', uid).order('created_at', desc=True).limit(20).execute().data or []
+        # DATA LISTS (SAFE)
+        deposits = db.table('deposits')\
+            .select('*')\
+            .eq('user_id', uid)\
+            .order('created_at', desc=True)\
+            .limit(20)\
+            .execute().data or []
 
-    investments = db.table('investments').select('*').eq('user_id', uid).order('created_at', desc=True).execute().data or []
+        withdrawals = db.table('withdrawals')\
+            .select('*')\
+            .eq('user_id', uid)\
+            .order('created_at', desc=True)\
+            .limit(20)\
+            .execute().data or []
 
-    transactions = db.table('transactions').select('*').eq('user_id', uid).order('created_at', desc=True).limit(30).execute().data or []
+        investments = db.table('investments')\
+            .select('*')\
+            .eq('user_id', uid)\
+            .order('created_at', desc=True)\
+            .execute().data or []
 
-    # SAFE COUNT
-    l1_res = db.table('profiles').select('id', count='exact').eq('referred_by', uid).execute()
-    l1_count = l1_res.count or 0
+        transactions = db.table('transactions')\
+            .select('*')\
+            .eq('user_id', uid)\
+            .order('created_at', desc=True)\
+            .limit(30)\
+            .execute().data or []
 
-    l2_res = db.table('profiles').select('id', count='exact').eq('referred_by_l2', uid).execute()
-    l2_count = l2_res.count or 0
+        # REFERRALS COUNT (SAFE)
+        l1_res = db.table('profiles')\
+            .select('id', count='exact')\
+            .eq('referred_by', uid)\
+            .execute()
+        l1_count = getattr(l1_res, "count", 0) or 0
 
-    # SAFE SUM
-    ref_earn = sum(
-        t.get('amount', 0)
-        for t in (transactions or [])
-        if t.get('type') == 'referral_bonus'
-    )
+        l2_res = db.table('profiles')\
+            .select('id', count='exact')\
+            .eq('referred_by_l2', uid)\
+            .execute()
+        l2_count = getattr(l2_res, "count", 0) or 0
 
-    return render_template(
-        'dashboard.html',
-        profile=profile,
-        deposits=deposits,
-        withdrawals=withdrawals,
-        investments=investments,
-        transactions=transactions,
-        l1_count=l1_count,
-        l2_count=l2_count,
-        referral_earnings=ref_earn,
-        plans=Config.INVESTMENT_PLANS,
-        usdt_trc20=Config.USDT_TRC20_ADDRESS,
-        usdt_bep20=Config.USDT_BEP20_ADDRESS,
-        whatsapp=Config.WHATSAPP_NUMBER,
-    )
+        # REFERRAL EARNINGS (SAFE)
+        ref_earn = sum(
+            t.get('amount', 0)
+            for t in transactions
+            if t.get('type') == 'referral_bonus'
+        )
+
+        return render_template(
+            'dashboard.html',
+            profile=profile,
+            deposits=deposits,
+            withdrawals=withdrawals,
+            investments=investments,
+            transactions=transactions,
+            l1_count=l1_count,
+            l2_count=l2_count,
+            referral_earnings=ref_earn,
+            plans=Config.INVESTMENT_PLANS,
+            usdt_trc20=Config.USDT_TRC20_ADDRESS,
+            usdt_bep20=Config.USDT_BEP20_ADDRESS,
+            whatsapp=Config.WHATSAPP_NUMBER,
+        )
+
+    except Exception as e:
+        return f"Dashboard Error: {str(e)}", 500
 
 
+# ─────────────────────────────────────────────
+# DEPOSIT
+# ─────────────────────────────────────────────
 @dashboard_bp.route('/deposit', methods=['POST'])
 @login_required
 def deposit():
     db = get_admin_supabase()
-    uid = session['user_id']
+    uid = session.get('user_id')
 
     try:
         amount = float(request.form.get('amount', 0))
@@ -80,38 +120,46 @@ def deposit():
             'created_at': datetime.now(timezone.utc).isoformat(),
         }).execute()
 
-        flash('Deposit submitted!', 'success')
+        flash('Deposit submitted successfully!', 'success')
 
     except Exception as e:
-        flash(f'Deposit error: {e}', 'error')
+        flash(f'Deposit error: {str(e)}', 'error')
 
     return redirect(url_for('dashboard.index'))
 
 
+# ─────────────────────────────────────────────
+# WITHDRAW
+# ─────────────────────────────────────────────
 @dashboard_bp.route('/withdraw', methods=['POST'])
 @login_required
 def withdraw():
     db = get_admin_supabase()
-    uid = session['user_id']
+    uid = session.get('user_id')
 
     try:
         amount = float(request.form.get('amount', 0))
         wallet = request.form.get('wallet_address', '').strip()
         network = request.form.get('network', '')
 
-        profile_res = db.table('profiles').select('balance').eq('id', uid).execute()
-        profile = profile_res.data[0] if profile_res.data else {'balance': 0}
+        profile_res = db.table('profiles')\
+            .select('balance')\
+            .eq('id', uid)\
+            .execute()
+
+        profile = (profile_res.data or [{}])[0]
+        balance = profile.get('balance', 0)
 
         if amount <= 0:
             flash('Amount must be greater than zero.', 'error')
             return redirect(url_for('dashboard.index'))
 
-        if amount > profile.get('balance', 0):
+        if amount > balance:
             flash('Insufficient balance.', 'error')
             return redirect(url_for('dashboard.index'))
 
         if not wallet:
-            flash('Wallet required.', 'error')
+            flash('Wallet address required.', 'error')
             return redirect(url_for('dashboard.index'))
 
         db.table('withdrawals').insert({
@@ -123,9 +171,9 @@ def withdraw():
             'created_at': datetime.now(timezone.utc).isoformat(),
         }).execute()
 
-        flash('Withdrawal submitted!', 'success')
+        flash('Withdrawal request submitted!', 'success')
 
     except Exception as e:
-        flash(f'Withdrawal error: {e}', 'error')
+        flash(f'Withdrawal error: {str(e)}', 'error')
 
     return redirect(url_for('dashboard.index'))
