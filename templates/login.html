@@ -11,7 +11,6 @@
     </div>
     <h2 class="auth-title">Welcome Back</h2>
     <p class="auth-subtitle">Sign in to your account</p>
-
     <form method="POST" action="{{ url_for('auth.login') }}" class="auth-form">
       <div class="form-group">
         <label>Email Address</label>
@@ -23,7 +22,6 @@
       </div>
       <button type="submit" class="btn btn--primary btn--full">Sign In</button>
     </form>
-
     <p class="auth-switch">Don't have an account? <a href="{{ url_for('auth.register') }}">Create one</a></p>
   </div>
 </div>
