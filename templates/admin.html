@@ -156,9 +156,10 @@
             <thead><tr><th>User</th><th>Amount</th><th>Network</th><th>Proof</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead>
             <tbody>
             {% for d in deposits %}
+            {% set d_amt = "%.2f"|format(d.get('amount',0)) %}
             <tr class="{{ 'row-pending' if d.get('status') == 'pending' else '' }}">
               <td>{{ user_map.get(d.get('user_id'), '—') }}</td>
-              <td><strong>${{ "%.2f"|format(d.get('amount',0)) }}</strong></td>
+              <td><strong>${{ d_amt }}</strong></td>
               <td>{{ d.get('network','—') }}</td>
               <td class="text-muted text-mono">{{ (d.get('proof_note') or '—')[:28] }}</td>
               <td><span class="status-badge status--{{ d.get('status','') }}">{{ d.get('status','').upper() }}</span></td>
@@ -168,7 +169,7 @@
                 <div class="action-btns">
                   <form method="POST" action="{{ url_for('admin.handle_deposit', deposit_id=d.id, action='approve') }}" style="display:inline">
                     <button type="submit" class="btn btn--xs btn--success"
-                      onclick="return confirm('Approve ${{ d.get(\'amount\',0) }}?')">✓ Approve</button>
+                      onclick="return confirm('Approve ${{ d_amt }}?')">✓ Approve</button>
                   </form>
                   <form method="POST" action="{{ url_for('admin.handle_deposit', deposit_id=d.id, action='reject') }}" style="display:inline">
                     <button type="submit" class="btn btn--xs btn--danger"
@@ -196,9 +197,10 @@
             <thead><tr><th>User</th><th>Amount</th><th>Wallet</th><th>Network</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead>
             <tbody>
             {% for w in withdrawals %}
+            {% set w_amt = "%.2f"|format(w.get('amount',0)) %}
             <tr class="{{ 'row-pending' if w.get('status') == 'pending' else '' }}">
               <td>{{ user_map.get(w.get('user_id'), '—') }}</td>
-              <td><strong>${{ "%.2f"|format(w.get('amount',0)) }}</strong></td>
+              <td><strong>${{ w_amt }}</strong></td>
               <td class="text-mono">{{ (w.get('wallet_address') or '—')[:18] }}…</td>
               <td>{{ w.get('network','—') }}</td>
               <td><span class="status-badge status--{{ w.get('status','') }}">{{ w.get('status','').upper() }}</span></td>
@@ -208,11 +210,11 @@
                 <div class="action-btns">
                   <form method="POST" action="{{ url_for('admin.handle_withdrawal', wd_id=w.id, action='approve') }}" style="display:inline">
                     <button type="submit" class="btn btn--xs btn--success"
-                      onclick="return confirm('Approve ${{ w.get(\'amount\',0) }}?')">✓ Approve</button>
+                      onclick="return confirm('Approve ${{ w_amt }}?')">✓ Approve</button>
                   </form>
                   <form method="POST" action="{{ url_for('admin.handle_withdrawal', wd_id=w.id, action='reject') }}" style="display:inline">
                     <button type="submit" class="btn btn--xs btn--danger"
-                      onclick="return confirm('Reject?')">✗ Reject</button>
+                      onclick="return confirm('Reject this withdrawal?')">✗ Reject</button>
                   </form>
                 </div>
                 {% else %}—{% endif %}
