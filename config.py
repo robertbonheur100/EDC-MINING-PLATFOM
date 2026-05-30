@@ -18,8 +18,8 @@ class Config:
     SUPABASE_SERVICE_KEY = os.environ.get('SUPABASE_SERVICE_KEY', 'YOUR_SERVICE_ROLE_KEY_HERE')
 
     # ── Admin ──────────────────────────────────────────────────
-    ADMIN_EMAIL    = os.environ.get('ADMIN_EMAIL',    '#')
-    ADMIN_PASSWORD = os.environ.get('ADMIN_PASSWORD', '#')
+    ADMIN_EMAIL    = os.environ.get('ADMIN_EMAIL',    'bonheurrobert701@gmail.com')
+    ADMIN_PASSWORD = os.environ.get('ADMIN_PASSWORD', 'Aaa111@@@')
 
     # ── Platform ───────────────────────────────────────────────
     DAILY_PROFIT_RATE = 0.02
