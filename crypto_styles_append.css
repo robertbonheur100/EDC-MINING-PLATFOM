@@ -1,0 +1,145 @@
+/* ─── Crypto / HTG Extension CSS ─────────────────────────────
+   Append this to static/css/main.css
+──────────────────────────────────────────────────────────── */
+
+/* ── Crypto Action Grid ───────────────────────────────────── */
+.crypto-action-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 1rem;
+}
+
+.crypto-action-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1.5rem 1rem;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+  background: var(--card);
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: center;
+}
+.crypto-action-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow);
+}
+
+.crypto-action-btn--buy    { border-color: rgba(34,197,94,0.3);  background: rgba(34,197,94,0.06); }
+.crypto-action-btn--sell   { border-color: rgba(239,68,68,0.3);  background: rgba(239,68,68,0.06); }
+.crypto-action-btn--convert{ border-color: rgba(59,124,244,0.3); background: rgba(59,124,244,0.06); }
+.crypto-action-btn--withdraw{ border-color: rgba(212,168,67,0.3); background: rgba(212,168,67,0.06); }
+
+.crypto-action-btn--buy:hover    { border-color: var(--green); }
+.crypto-action-btn--sell:hover   { border-color: var(--red); }
+.crypto-action-btn--convert:hover{ border-color: var(--accent); }
+.crypto-action-btn--withdraw:hover{ border-color: var(--gold); }
+
+.ca-icon  { font-size: 1.75rem; }
+.ca-label { font-family: var(--font-head); font-size: 0.9rem; font-weight: 700; color: var(--text); }
+.ca-desc  { font-size: 11px; color: var(--text-3); }
+
+/* ── NatCash Notice ───────────────────────────────────────── */
+.natcash-notice {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  background: rgba(245,158,11,0.08);
+  border: 1px solid rgba(245,158,11,0.25);
+  border-radius: var(--radius-lg);
+  padding: 1.25rem 1.5rem;
+  flex-wrap: wrap;
+}
+
+.natcash-icon { font-size: 2.5rem; }
+
+.natcash-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  flex: 1;
+}
+
+.natcash-body strong {
+  font-size: 0.9rem;
+  color: var(--text);
+}
+
+.natcash-number {
+  font-family: 'Courier New', monospace;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #f59e0b;
+  letter-spacing: 0.1em;
+}
+
+.natcash-rate {
+  margin-left: auto;
+}
+
+.rate-display {
+  background: rgba(212,168,67,0.12);
+  border: 1px solid rgba(212,168,67,0.25);
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
+  font-size: 13px;
+  color: var(--gold);
+  white-space: nowrap;
+}
+
+/* ── Form Hint ────────────────────────────────────────────── */
+.form-hint {
+  font-size: 12px;
+  color: var(--gold);
+  margin-top: 2px;
+}
+
+/* ── Convert Grid ─────────────────────────────────────────── */
+.convert-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+}
+@media (max-width: 700px) { .convert-grid { grid-template-columns: 1fr; } }
+
+/* ── Balance Chip Small ───────────────────────────────────── */
+.balance-chip-sm {
+  background: rgba(212,168,67,0.1);
+  border: 1px solid rgba(212,168,67,0.2);
+  border-radius: 12px;
+  padding: 2px 10px;
+  font-size: 12px;
+  color: var(--gold);
+}
+
+/* ── Rate Info Card ───────────────────────────────────────── */
+.rate-info-card {
+  background: var(--bg-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.rate-info-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1.25rem;
+  border-bottom: 1px solid var(--border);
+  font-size: 13px;
+  color: var(--text-2);
+}
+.rate-info-row:last-child { border-bottom: none; }
+.rate-info-row strong { color: var(--text); }
+
+/* ── HTG type badges ──────────────────────────────────────── */
+.type--buy             { background: rgba(34,197,94,0.1);  color: var(--green); border-color: rgba(34,197,94,0.2); }
+.type--sell            { background: rgba(239,68,68,0.1);  color: var(--red);   border-color: rgba(239,68,68,0.2); }
+.type--convert         { background: rgba(59,124,244,0.1); color: var(--accent); border-color: rgba(59,124,244,0.2); }
+.type--withdrawal_htg  { background: rgba(245,158,11,0.1); color: var(--amber); border-color: rgba(245,158,11,0.2); }
+.type--admin_adjustment{ background: rgba(139,92,246,0.1); color: #a78bfa; border-color: rgba(139,92,246,0.2); }
+
+/* ── Topbar multi-balance chip ────────────────────────────── */
+.balance-chip { flex-wrap: wrap; }
