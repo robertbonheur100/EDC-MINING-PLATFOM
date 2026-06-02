@@ -7,8 +7,6 @@ from routes.dashboard import dashboard_bp
 from routes.admin import admin_bp
 from routes.investments import investments_bp
 from routes.referrals import referrals_bp
-from routes.admin_crypto import admin_crypto_bp  # ← NEW
-
 
 def create_app():
     app = Flask(__name__)
@@ -22,7 +20,6 @@ def create_app():
     app.register_blueprint(admin_bp,        url_prefix='/admin')
     app.register_blueprint(investments_bp,  url_prefix='/investments')
     app.register_blueprint(referrals_bp,    url_prefix='/referrals')
-    app.register_blueprint(admin_crypto_bp, url_prefix='/admin/crypto')  # ← NEW
 
     @app.route('/')
     def index():
