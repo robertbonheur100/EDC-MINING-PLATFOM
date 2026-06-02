@@ -1,4 +1,3 @@
-cat > /mnt/user-data/outputs/admin.py << 'PYEOF'
 import logging
 from datetime import datetime, timezone
 from flask import Blueprint, render_template, request, redirect, url_for, flash
@@ -414,4 +413,3 @@ def _log(db, action, target_id, details, now):
         }).execute()
     except Exception as e:
         logger.error(f'[Admin log] {e}')
-PYEOF
