@@ -374,10 +374,11 @@
             <tbody>
             {% for w in htg_wds %}
             {% set w_htg = "%.2f"|format(w.get('amount_htg',0)) %}
+            {% set w_natcash = w.get('natcash_number','') %}
             <tr class="{{ 'row-pending' if w.get('status') == 'pending' else '' }}">
               <td>{{ user_map.get(w.get('user_id'), '—') }}</td>
               <td><strong>{{ w_htg }} HTG</strong></td>
-              <td class="text-mono">{{ w.get('natcash_number','—') }}</td>
+              <td class="text-mono">{{ w_natcash }}</td>
               <td><span class="status-badge status--{{ w.get('status','') }}">{{ w.get('status','').upper() }}</span></td>
               <td class="text-muted">{{ (w.get('created_at') or '')[:10] }}</td>
               <td>
@@ -385,7 +386,7 @@
                 <div class="action-btns">
                   <form method="POST" action="{{ url_for('admin.handle_htg_withdrawal', wd_id=w.id, action='approve') }}" style="display:inline">
                     <button type="submit" class="btn btn--xs btn--success"
-                      onclick="return confirm('Approve HTG WD — send {{ w_htg }} HTG to {{ w.get(\'natcash_number\',\'\') }}?')">✓ Approve</button>
+                      onclick="return confirm('Approve HTG WD — send {{ w_htg }} HTG to {{ w_natcash }}?')">✓ Approve</button>
                   </form>
                   <form method="POST" action="{{ url_for('admin.handle_htg_withdrawal', wd_id=w.id, action='reject') }}" style="display:inline">
                     <button type="submit" class="btn btn--xs btn--danger"
