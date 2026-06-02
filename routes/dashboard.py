@@ -1,4 +1,3 @@
-cat > /mnt/user-data/outputs/dashboard.py << 'PYEOF'
 from datetime import datetime, timezone
 from flask import Blueprint, render_template, request, redirect, url_for, session, flash
 from config import Config
@@ -434,4 +433,3 @@ def htg_withdraw():
         flash(f'Withdrawal error: {e}', 'error')
 
     return redirect(url_for('dashboard.index'))
-PYEOF
